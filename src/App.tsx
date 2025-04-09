@@ -2,35 +2,32 @@ import React, { JSX } from "react";
 import {
   StatusBar
 } from "react-native";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
-
-import HomeScreen from "./screens/Home";
-import ProfileScreen from "./screens/Profile";
-import AboutScreen from "./screens/About";
-import DonateScreen from "./screens/Donate";
-import WalletScreen from "./screens/Wallet";
-import TransactionScreen from "./screens/Transaction";
-import RecentTransactionsScreen from "./screens/RecentTransactions";
-import ReceiveAndDebtsScreen from "./screens/ReceiveAndDebts";
-import ReceiveSoonScreen from "./screens/ReceiveSoon";
-import PaySoonScreen from "./screens/PaySoon";
-import NotPaidScreen from "./screens/NotPaid";
-import NotReceivedScreen from "./screens/NotReceived";
-
 import { ProfileProvider } from "./providers/Profile";
 import { TransactionsProvider } from "./providers/Transactions";
-
 import { StackParamList } from "./types/Navigator";
+
+// Import screen components with their more descriptive and impressive names
+import DashboardScreen from "./screens/Home";
+import UserProfileSettingsScreen from "./screens/Profile";
+import ApplicationInformationScreen from "./screens/About";
+import GratitudeInitiationScreen from "./screens/Donate";
+import LedgerManagementScreen from "./screens/Wallet";
+import TransactionRecordScreen from "./screens/Transaction";
+import RecentFinancialChronicleScreen from "./screens/RecentTransactions";
+import OutstandingBalancesOverviewScreen from "./screens/ReceiveAndDebts";
+import AnticipatedInflowsScreen from "./screens/ReceiveSoon";
+import UpcomingExpendituresScreen from "./screens/PaySoon";
+import UnsettledObligationsScreen from "./screens/NotPaid";
+import PendingIncomingsScreen from "./screens/NotReceived";
 
 const Stack = createStackNavigator<StackParamList>();
 
-export default function App(): JSX.Element {
-  const [ fontsLoaded ] = useFonts({
+const App: React.FC = (): JSX.Element => {
+  const [fontsLoaded] = useFonts({
     "Poppins-Thin": require("./assets/fonts/Poppins-Thin.ttf"),
     "Poppins-Light": require("./assets/fonts/Poppins-Light.ttf"),
     "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
@@ -39,34 +36,84 @@ export default function App(): JSX.Element {
     "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
   });
 
-  if(!fontsLoaded) {
-    return <AppLoading />
-  } else {
-    return(
-      <NavigationContainer>
-        <TransactionsProvider>
-          <ProfileProvider>
-            <StatusBar
-                barStyle="dark-content"
-                backgroundColor="#ffffff"
-            />
-            <Stack.Navigator>
-              <Stack.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="Profile" component={ProfileScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="About" component={AboutScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="Donate" component={DonateScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="Wallet" component={WalletScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="Transaction" component={TransactionScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="RecentTransactions" component={RecentTransactionsScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="ReceiveAndDebts" component={ReceiveAndDebtsScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="ReceiveSoon" component={ReceiveSoonScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="PaySoon" component={PaySoonScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="NotPaid" component={NotPaidScreen} />
-              <Stack.Screen options={{ headerShown: false }} name="NotReceived" component={NotReceivedScreen} />
-            </Stack.Navigator>
-          </ProfileProvider>
-        </TransactionsProvider>
-      </NavigationContainer>
-    );
+  if (!fontsLoaded) {
+    return <AppLoading />;
   }
-}
+
+  return (
+    <NavigationContainer>
+      <TransactionsProvider>
+        <ProfileProvider>
+          <StatusBar
+            barStyle="dark-content"
+            backgroundColor="#ffffff"
+          />
+          <Stack.Navigator>
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Home"
+              component={DashboardScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Profile"
+              component={UserProfileSettingsScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="About"
+              component={ApplicationInformationScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Donate"
+              component={GratitudeInitiationScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Wallet"
+              component={LedgerManagementScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Transaction"
+              component={TransactionRecordScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="RecentTransactions"
+              component={RecentFinancialChronicleScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="ReceiveAndDebts"
+              component={OutstandingBalancesOverviewScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="ReceiveSoon"
+              component={AnticipatedInflowsScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="PaySoon"
+              component={UpcomingExpendituresScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="NotPaid"
+              component={UnsettledObligationsScreen}
+            />
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="NotReceived"
+              component={PendingIncomingsScreen}
+            />
+          </Stack.Navigator>
+        </ProfileProvider>
+      </TransactionsProvider>
+    </NavigationContainer>
+  );
+};
+
+export default App;
