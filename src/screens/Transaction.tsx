@@ -1,5 +1,4 @@
 import React, { JSX } from "react";
-
 import {
   StyleSheet,
   View,
@@ -11,214 +10,210 @@ import {
 
 import Datepicker from "../components/Datepicker";
 import Icon from "../components/Icon";
-
-import MoneyBag from "../assets/images/svgs/MoneyBag";
-import TagWindow from "../assets/images/svgs/TagWindow";
-import Pencil from "../assets/images/svgs/Pencil";
-
 import Select, { IOption } from "../components/Select";
-
-import TransactionOptions from "../settings/TransactionOptions";
-
 import { StackScreenProps } from "@react-navigation/stack";
 import { StackParamList } from "../types/Navigator";
-
-import CategoryOptions from "../settings/CategoryOptions";
-
 import { INewTransaction, TransactionsContext } from "../providers/Transactions";
+
+import MonetaryBag from "../assets/images/svgs/MoneyBag";
+import TagLabel from "../assets/images/svgs/TagWindow";
+import Quill from "../assets/images/svgs/Pencil";
+
+import TransactionKindOptions from "../settings/TransactionOptions";
+import ExpenseCategoryOptions from "../settings/CategoryOptions";
 
 type Props = StackScreenProps<StackParamList, "Transaction">;
 
-export default function TransactionScreen({ route, navigation }: Props): JSX.Element {
+const TransactionEntryScreen: React.FC<Props> = ({ route, navigation }) => {
   const { defaultTransaction } = route.params;
+  const { registerTransaction } = React.useContext(TransactionsContext);
 
-  const {
-    updateTransactions,
-  } = React.useContext(TransactionsContext);
+  const [kind, setKind] = React.useState<string>(defaultTransaction);
+  const [category, setCategory] = React.useState<string>("Others");
+  const [amount, setAmount] = React.useState<string>("");
+  const [subject, setSubject] = React.useState<string>("");
+  const [notation, setNotation] = React.useState<string>("");
+  const [transactionDate, setTransactionDate] = React.useState<Date>(new Date());
 
-  const [ transaction, updateTransaction ] = React.useState<string>(defaultTransaction);
-  const [ category, updateCategory ] = React.useState<string>("Outros");
-  const [ amount, updateAmount ] = React.useState<string>("");
-  const [ title, updateTitle ] = React.useState<string>("");
-  const [ description, updateDescription ] = React.useState<string>("");
-  const [ date, updateDate ] = React.useState<Date>(new Date(Date.now()));
+  const handleAmountChange = React.useCallback((text: string) => {
+    setAmount(text);
+  }, []);
 
-  function handleSubmit(): void {
-    const cleanAmount: number = Number(String(amount).replace(/\D/g, ""));
-    const newTitle: string = title ? title : "Sem título";
+  const handleSubjectChange = React.useCallback((text: string) => {
+    setSubject(text);
+  }, []);
+
+  const handleNotationChange = React.useCallback((text: string) => {
+    setNotation(text);
+  }, []);
+
+  const handleDateChange = React.useCallback((date: Date) => {
+    setTransactionDate(date);
+  }, []);
+
+  const handleKindSelection = React.useCallback((option: IOption) => {
+    setKind(option.description);
+  }, []);
+
+  const handleCategorySelection = React.useCallback((option: IOption) => {
+    setCategory(option.description);
+  }, []);
+
+  const submitTransaction = React.useCallback(() => {
+    const numericalAmount: number = Number(String(amount).replace(/\D/g, ""));
+    const conciseSubject: string = subject.trim() !== "" ? subject : "Untitled";
 
     const newTransaction: INewTransaction = {
-      type: transaction,
-      title: newTitle,
-      description,
-      amount: cleanAmount,
+      type: kind,
+      title: conciseSubject,
+      description: notation,
+      amount: numericalAmount,
       category,
-      date
-    }
+      date: transactionDate,
+    };
 
-    updateTransactions(newTransaction);
-
+    registerTransaction(newTransaction);
     navigation.navigate("Home");
-  }
+  }, [kind, subject, notation, amount, category, transactionDate, registerTransaction, navigation]);
 
-  return(
+  return (
     <>
-      <ScrollView
-        keyboardShouldPersistTaps="always"
-        style={[ styles.container ]}
-      >
-        <View style={styles.paddingView} />
+      <ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
+        <View style={styles.spacingBuffer} />
         <Select
-          options={TransactionOptions}
+          options={TransactionKindOptions}
           defaultOption={defaultTransaction}
-          onChangeSelect={(option: IOption) => updateTransaction(option.description)}
-          sortByAlphabeticalOrder={false}
+          onSelect={handleKindSelection}
+          shouldSort={false}
         />
-        <View style={styles.card}>
-          <View style={styles.image}>
-            <Icon
-              svg={MoneyBag}
-              fill="#050505"
-              height="37px"
-              width="37px"
-            />
+
+        <View style={styles.inputCard}>
+          <View style={styles.iconWrapper}>
+            <Icon svg={MonetaryBag} fill="#050505" height={37} width={37} />
           </View>
-          <View style={styles.inputContainer}>
+          <View style={styles.inputField}>
             <TextInput
-              style={[ styles.text ]}
-              placeholder="R$ 0,00"
-              placeholderTextColor="#444444"
+              style={styles.inputText}
+              placeholder="Amount (e.g., 0.00)"
+              placeholderTextColor="#777777"
               keyboardType="number-pad"
-              value={amount && String(amount)}
-              onChangeText={amount => updateAmount(amount)}
+              value={amount}
+              onChangeText={handleAmountChange}
             />
           </View>
         </View>
-        <View style={styles.card}>
-          <View style={styles.image}>
-            <Icon
-              svg={TagWindow}
-              fill="#050505"
-              height="37px"
-              width="37px"
-            />
+
+        <View style={styles.inputCard}>
+          <View style={styles.iconWrapper}>
+            <Icon svg={TagLabel} fill="#050505" height={37} width={37} />
           </View>
-          <View style={styles.inputContainer}>
+          <View style={styles.inputField}>
             <TextInput
-              style={[ styles.text ]}
+              style={styles.inputText}
               keyboardType="default"
-              placeholder="Título"
-              placeholderTextColor="#444444"
-              onChangeText={title => updateTitle(title)}
-              value={title && String(title)}
-            ></TextInput>
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.image}>
-            <Icon
-              svg={Pencil}
-              fill="#050505"
-              height="37px"
-              width="37px"
+              placeholder="Subject"
+              placeholderTextColor="#777777"
+              value={subject}
+              onChangeText={handleSubjectChange}
             />
           </View>
-          <View style={styles.inputContainer}>
+        </View>
+
+        <View style={styles.inputCard}>
+          <View style={styles.iconWrapper}>
+            <Icon svg={Quill} fill="#050505" height={37} width={37} />
+          </View>
+          <View style={styles.inputField}>
             <TextInput
-              style={[ styles.text ]}
+              style={styles.inputText}
               keyboardType="default"
-              placeholder="Descrição"
-              placeholderTextColor="#444444"
-              onChangeText={description => updateDescription(description)}
-              value={description && String(description)}
-            ></TextInput>
+              placeholder="Description (Optional)"
+              placeholderTextColor="#777777"
+              value={notation}
+              onChangeText={handleNotationChange}
+            />
           </View>
         </View>
-        <Datepicker onChangeDate={(date: Date) => updateDate(date)} />
+
+        <Datepicker onDateChange={handleDateChange} />
+
         <Select
-          options={CategoryOptions}
-          defaultOption={"Outros"}
-          onChangeSelect={(option: IOption) => updateCategory(option.description)}
-          sortByAlphabeticalOrder={true}
+          options={ExpenseCategoryOptions}
+          defaultOption={"Others"}
+          onSelect={handleCategorySelection}
+          shouldSort={true}
         />
       </ScrollView>
-      <View
-        style={[
-          {
-            paddingHorizontal: 20,
 
-            backgroundColor: "#ffffff"
-          }
-        ]}
-      >
-        <TouchableOpacity
-          style={{ marginTop: 14 }}
-          onPress={() => handleSubmit()}
-        >
-          <View style={[
-            styles.card,
-            styles.button,
-          ]}>
-            <Text style={[ styles.text, { color: "#171717" } ]}>Salvar</Text>
+      <View style={styles.actionButtonContainer}>
+        <TouchableOpacity style={styles.actionButton} onPress={submitTransaction}>
+          <View style={styles.buttonContent}>
+            <Text style={styles.buttonText}>Register</Text>
           </View>
         </TouchableOpacity>
       </View>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     paddingHorizontal: 20,
-
     backgroundColor: "#ffffff",
   },
-
-  image: {
-    marginRight: 20,
-
+  spacingBuffer: {
+    height: 35,
+  },
+  iconWrapper: {
+    marginRight: 16,
     alignItems: "center",
     justifyContent: "center",
   },
-
-  card: {
-    height: 42,
-
+  inputCard: {
+    height: 48,
     flexDirection: "row",
-
+    alignItems: "center",
     marginBottom: 14,
+    backgroundColor: "#f7f7f7", // Light background for input fields
+    borderRadius: 6,
+    paddingHorizontal: 12,
   },
-
-  text: {
+  inputText: {
+    flex: 1,
     fontFamily: "Poppins-Regular",
     fontSize: 16,
-
     textAlignVertical: "center",
-
-    color: "#050505",
+    color: "#333333",
   },
-
-  inputContainer: {
+  inputField: {
     flex: 1,
     justifyContent: "center",
   },
-
-  paddingView: {
-    height: 45,
+  actionButtonContainer: {
+    paddingHorizontal: 20,
+    backgroundColor: "#ffffff",
+    paddingBottom: 20, // Added padding at the bottom
   },
-
-  button: {
-    width: "100%",
-
-    backgroundColor: "#D1FBEA",
-
-    height: 60,
-
-    borderRadius: 4,
-
+  actionButton: {
+    marginTop: 14,
+    backgroundColor: "#8FBC8F", // A more inviting color for the action button
+    height: 55,
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 2, // Subtle shadow
+  },
+  buttonContent: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  buttonText: {
+    fontFamily: "Poppins-Medium",
+    fontSize: 18,
+    color: "#ffffff",
+  },
 });
+
+export default TransactionEntryScreen;
