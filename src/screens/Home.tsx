@@ -1,7 +1,4 @@
 import React, { JSX } from "react";
-
-import { StackScreenProps } from "@react-navigation/stack";
-
 import {
   StyleSheet,
   View,
@@ -9,27 +6,22 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-
+import { StackScreenProps } from "@react-navigation/stack";
 import { ProfileContext } from "../providers/Profile";
-
+import { TransactionsContext } from "../providers/Transactions";
 import { StackParamList } from "../types/Navigator";
-
 import Icon from "../components/Icon";
-
 import Wallet from "../assets/images/svgs/Wallet";
 import MoneyBox from "../assets/images/svgs/MoneyBox";
 import CardPayment from "../assets/images/svgs/CardPayment";
 import ReceivDollar from "../assets/images/svgs/ReceivDollar";
 import Donate from "../assets/images/svgs/Donate";
 import UpRight from "../assets/images/svgs/UpRight";
-
 import formatCurrency from "../utils/formatCurrency";
-
-import { TransactionsContext } from "../providers/Transactions";
 
 type Props = StackScreenProps<StackParamList, "Home">;
 
-export default function HomeScreen({ navigation }: Props): JSX.Element {
+const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const {
     walletAmount,
     incomesAmount,
@@ -37,469 +29,279 @@ export default function HomeScreen({ navigation }: Props): JSX.Element {
     receiveAmount,
     debtsAmount,
     recentTransactions,
-    receiveAndDebts,
-    receiveSoon,
-    paySoon,
-    notPaid,
-    notReceived,
-    RecentTransactions,
-    ReceiveAndDebts,
-    ReceiveSoon,
-    PaySoon,
-    NotPaid,
-    NotReceived,
+    receivablesAndPayables,
+    impendingIncomes,
+    imminentOutlays,
+    unsettledOutgoings,
+    outstandingIncomings,
+    ChronicleRecentTransactions,
+    CatalogueReceivablesAndPayables,
+    ProjectImpendingIncomes,
+    ForecastImminentOutlays,
+    EnumerateUnsettledOutgoings,
+    TabulateOutstandingIncomings,
   } = React.useContext(TransactionsContext);
 
   const { username } = React.useContext(ProfileContext);
 
-  return(
+  return (
     <ScrollView style={styles.container}>
       <View style={styles.greetingsContainer}>
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Profile")}
-        >
-          <Text numberOfLines={1} style={styles.greetingsText}>Salutations, { username ? username : "What's your moniker ?" }</Text>
+        <TouchableWithoutFeedback onPress={() => navigation.navigate("Profile")}>
+          <Text numberOfLines={1} style={styles.greetingsText}>
+            Salutations, {username || "What's your moniker ?"}
+          </Text>
         </TouchableWithoutFeedback>
       </View>
+
       <View style={styles.statusContainer}>
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Wallet")}
-        >
-          <View
-            style={[
-              styles.walletCard,
-              {
-                backgroundColor: "#D1FBEA"
-              }
-            ]}
-          >
+        <TouchableWithoutFeedback onPress={() => navigation.navigate("Wallet")}>
+          <View style={[styles.walletCard, styles.cardShadow, { backgroundColor: "#D1FBEA" }]}>
             <View style={styles.description}>
-              <Text style={[ styles.text, styles.textDescription ]}>Balance in your coffer</Text>
-              <Icon
-                svg={Wallet}
-                fill="#171717"
-                height="40px"
-                width="40px"
-              />
+              <Text style={[styles.text, styles.textDescription]}>Balance in your coffer</Text>
+              <Icon svg={Wallet} fill="#171717" height={40} width={40} />
             </View>
-            <View>
-              <Text numberOfLines={1} style={[ styles.text, styles.textAmount ]}>
-                {formatCurrency(walletAmount)}
+            <Text numberOfLines={1} style={[styles.text, styles.textAmount]}>
+              {formatCurrency(walletAmount)}
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback
+          onPress={() => navigation.navigate("Transaction", { defaultTransaction: "Income" })}
+        >
+          <View style={[styles.card, styles.cardShadow, { backgroundColor: "#FCEDD2" }]}>
+            <Icon svg={MoneyBox} fill="#171717" height={37} width={37} style={styles.cardIcon} />
+            <View style={styles.cardTextContainer}>
+              <Text style={[styles.text, styles.textDescription]}>Inflow</Text>
+              <Text numberOfLines={1} style={[styles.text, styles.textAmount, styles.amountFontSize]}>
+                {formatCurrency(incomesAmount)}
               </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Transaction", {
-            defaultTransaction: "Income"
-          })}
-        >
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: "#FCEDD2"
-              }
-            ]}
-          >
-            <View style={[ { marginRight: 20 } ]}>
-              <Icon
-                svg={MoneyBox}
-                fill="#171717"
-                height="37px"
-                width="37px"
-              />
-            </View>
-            <View style={[
-              {
-                flex: 1,
 
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }
-            ]}>
-              <Text style={[ styles.text, styles.textDescription ]}>Inflow</Text>
-              <Text numberOfLines={1} style={[
-                styles.text,
-                styles.textAmount,
-                {
-                  fontSize: 20
-                }
-              ]}>{formatCurrency(incomesAmount)}</Text>
+        <TouchableWithoutFeedback
+          onPress={() => navigation.navigate("Transaction", { defaultTransaction: "Expense" })}
+        >
+          <View style={[styles.card, styles.cardShadow, { backgroundColor: "#E2D5FE" }]}>
+            <Icon svg={CardPayment} fill="#171717" height={37} width={37} style={styles.cardIcon} />
+            <View style={styles.cardTextContainer}>
+              <Text style={[styles.text, styles.textDescription]}>Outlay</Text>
+              <Text numberOfLines={1} style={[styles.text, styles.textAmount, styles.amountFontSize]}>
+                {formatCurrency(expensesAmount)}
+              </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Transaction", {
-            defaultTransaction: "Expense"
-          })}
-        >
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: "#E2D5FE"
-              }
-            ]}
-          >
-            <View style={[ { marginRight: 20 } ]}>
-              <Icon
-                svg={CardPayment}
-                fill="#171717"
-                height="37px"
-                width="37px"
-              />
-            </View>
-            <View style={[
-              {
-                flex: 1,
 
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }
-            ]}>
-              <Text style={[ styles.text, styles.textDescription ]}>Outlay</Text>
-              <Text numberOfLines={1} style={[
-                styles.text,
-                styles.textAmount,
-                {
-                  fontSize: 20
-                }
-              ]}>{formatCurrency(expensesAmount)}</Text>
+        <TouchableWithoutFeedback
+          onPress={() => navigation.navigate("Transaction", { defaultTransaction: "To Receive" })}
+        >
+          <View style={[styles.card, styles.cardShadow, { backgroundColor: "#CFF4CF" }]}>
+            <Icon svg={ReceivDollar} fill="#171717" height={37} width={37} style={styles.cardIcon} />
+            <View style={styles.cardTextContainer}>
+              <Text style={[styles.text, styles.textDescription]}>Receivable Amount</Text>
+              <Text numberOfLines={1} style={[styles.text, styles.textAmount, styles.amountFontSize]}>
+                {formatCurrency(receiveAmount)}
+              </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Transaction", {
-            defaultTransaction: "To Receive"
-          })}
-        >
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: "#CFF4CF"
-              }
-            ]}
-          >
-            <View style={[ { marginRight: 20 } ]}>
-              <Icon
-                svg={ReceivDollar}
-                fill="#171717"
-                height="37px"
-                width="37px"
-              />
-            </View>
-            <View style={[
-              {
-                flex: 1,
 
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }
-            ]}>
-              <Text style={[ styles.text, styles.textDescription ]}>Receivable Amount</Text>
-              <Text numberOfLines={1} style={[
-                styles.text,
-                styles.textAmount,
-                {
-                  fontSize: 20
-                }
-              ]}>{formatCurrency(receiveAmount)}</Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Transaction", {
-            defaultTransaction: "Debt"
-          })}
+          onPress={() => navigation.navigate("Transaction", { defaultTransaction: "Debt" })}
         >
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: "#F3DACC"
-              }
-            ]}
-          >
-            <View style={[ { marginRight: 20 } ]}>
-              <Icon
-                svg={Donate}
-                fill="#171717"
-                height="37px"
-                width="37px"
-              />
-            </View>
-            <View style={[
-              {
-                flex: 1,
-
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }
-            ]}>
-              <Text style={[ styles.text, styles.textDescription ]}>Liability</Text>
-              <Text numberOfLines={1} style={[
-                styles.text,
-                styles.textAmount,
-                {
-                  fontSize: 20
-                }
-              ]}>{formatCurrency(debtsAmount)}</Text>
+          <View style={[styles.card, styles.cardShadow, { backgroundColor: "#F3DACC" }]}>
+            <Icon svg={Donate} fill="#171717" height={37} width={37} style={styles.cardIcon} />
+            <View style={styles.cardTextContainer}>
+              <Text style={[styles.text, styles.textDescription]}>Liability</Text>
+              <Text numberOfLines={1} style={[styles.text, styles.textAmount, styles.amountFontSize]}>
+                {formatCurrency(debtsAmount)}
+              </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
       </View>
-      {
-        recentTransactions.length > 0 &&
+
+      {recentTransactions.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("RecentTransactions")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Recent Financial Movements</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("RecentTransactions")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Recent Financial Movements</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <RecentTransactions limit={5} />
+            <ChronicleRecentTransactions limit={5} />
           </View>
         </View>
-      }
-      {
-        receiveAndDebts.length > 0 &&
+      )}
+
+      {receivablesAndPayables.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("ReceiveAndDebts")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Outstanding Receivables and Payables</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("ReceiveAndDebts")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Outstanding Receivables and Payables</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <ReceiveAndDebts limit={5} />
+            <CatalogueReceivablesAndPayables limit={5} />
           </View>
         </View>
-      }
-      {
-        receiveSoon.length > 0 &&
+      )}
+
+      {impendingIncomes.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("ReceiveSoon")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Impending Incomes</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("ReceiveSoon")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Impending Incomes</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <ReceiveSoon limit={5} />
+            <ProjectImpendingIncomes limit={5} />
           </View>
         </View>
-      }
-      {
-        paySoon.length > 0 &&
+      )}
+
+      {imminentOutlays.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("PaySoon")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Upcoming Expenditures</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("PaySoon")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Upcoming Expenditures</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <PaySoon limit={5} />
+            <ForecastImminentOutlays limit={5} />
           </View>
         </View>
-      }
-      {
-        notPaid.length > 0 &&
+      )}
+
+      {unsettledOutgoings.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("NotPaid")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Unsettled Outgoings</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("NotPaid")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Unsettled Outgoings</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <NotPaid limit={5} />
+            <EnumerateUnsettledOutgoings limit={5} />
           </View>
         </View>
-      }
-      {
-        notReceived.length > 0 &&
+      )}
+
+      {outstandingIncomings.length > 0 && (
         <View style={styles.sectionContainer}>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate("NotReceived")}
-          >
-            <View style={[
-              {
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 16
-              }
-            ]}>
-              <Text numberOfLines={1} style={styles.text}>Outstanding Incomings</Text>
-              <Icon
-                svg={UpRight}
-                fill="#050505"
-                height="16px"
-                width="16px"
-              />
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("NotReceived")}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Outstanding Incomings</Text>
+              <Icon svg={UpRight} fill="#050505" height={16} width={16} />
             </View>
           </TouchableWithoutFeedback>
           <View>
-            <NotReceived limit={5} />
+            <TabulateOutstandingIncomings limit={5} />
           </View>
         </View>
-      }
+      )}
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: "#ffffff",
   },
-
   statusContainer: {
     marginVertical: 10,
     marginHorizontal: 20,
-
     justifyContent: "center",
   },
-
   greetingsContainer: {
     height: 48,
-
-    marginVertical: 45,
+    marginVertical: 30, // Adjusted margin
     marginHorizontal: 20,
-
     justifyContent: "center",
   },
-
   greetingsText: {
     fontFamily: "Poppins-Medium",
     fontSize: 24,
-
     textAlignVertical: "center",
-
-    color: "#050505"
+    color: "#050505",
   },
-
   sectionContainer: {
-    justifyContent: "center",
-
-    marginVertical: 45,
+    marginVertical: 30, // Adjusted margin
     marginHorizontal: 20,
   },
-
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    alignItems: "center", // Align items vertically in the header
+  },
+  sectionTitle: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 16,
+    color: "#050505",
+  },
   walletCard: {
     padding: 20,
-
     borderRadius: 8,
-
     marginBottom: 14,
   },
-
   card: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-
     flexDirection: "row",
     alignItems: "center",
-
     borderRadius: 8,
-
     marginBottom: 14,
   },
-
+  cardIcon: {
+    marginRight: 20,
+  },
+  cardTextContainer: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
   description: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
     marginBottom: 21,
   },
-
   text: {
     fontFamily: "Poppins-Regular",
     fontSize: 16,
-
     textAlignVertical: "center",
-
     color: "#171717",
   },
-
   textAmount: {
     fontFamily: "Poppins-Medium",
     fontSize: 24,
   },
-
   textDescription: {
     fontSize: 14,
-
-    color: "#161618"
-  }
+    color: "#161618",
+  },
+  amountFontSize: {
+    fontSize: 20,
+  },
+  cardShadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 });
+
+export default HomeScreen;
